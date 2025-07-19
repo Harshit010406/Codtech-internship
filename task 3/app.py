@@ -1,0 +1,23 @@
+from flask import Flask, request, jsonify, render_template
+import joblib
+import numpy as np
+
+app = Flask(__name__)
+model = joblib.load("model.pkl")
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        features = [float(x) for x in request.form.values()]
+        final = np.array([features])
+        prediction = model.predict(final)[0]
+        return render_template('index.html', prediction_text=f'Iris Class: {prediction}')
+    except Exception as e:
+        return str(e)
+
+if __name__ == "__main__":
+    app.run(debug=True)
